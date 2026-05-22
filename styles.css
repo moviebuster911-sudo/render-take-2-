@@ -1,0 +1,258 @@
+:root {
+    --bg: #e5ddd5;
+    --surface: #f8f9f9;
+    --surface-strong: #ffffff;
+    --text: #2c2f33;
+    --text-muted: #5f6b73;
+    --primary: #25d366;
+    --secondary: #128c7e;
+    --border: rgba(0, 0, 0, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0f9b76 0%, #51c7a7 100%);
+    color: var(--text);
+}
+
+.page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.topbar {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(12px);
+}
+
+.topbar h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.topbar p {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.content {
+    display: grid;
+    gap: 20px;
+}
+
+.upload-panel,
+.chat-frame {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 24px;
+}
+
+.file-label {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 2px dashed rgba(0,0,0,0.12);
+    border-radius: 16px;
+    background: #fbfbfb;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-align: center;
+}
+
+.file-label input {
+    display: none;
+}
+
+#pasteText {
+    width: 100%;
+    min-height: 180px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+}
+
+.options-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.primary-btn,
+.secondary-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 22px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.secondary-btn {
+    background: #ffffff;
+    color: var(--text);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.error {
+    color: #b00020;
+    min-height: 1.25em;
+}
+
+.author-select label,
+.author-select select {
+    display: block;
+    width: 100%;
+}
+
+.author-select select {
+    margin-top: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--text);
+}
+
+.hidden {
+    display: none;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.chat-header p {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+}
+
+.phone {
+    width: 100%;
+    max-width: 450px;
+    min-height: 600px;
+    margin: 0 auto;
+    padding: 18px 14px 12px;
+    background: #1f2c34;
+    border-radius: 44px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+    position: relative;
+}
+
+.phone::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 6px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 999px;
+}
+
+.screen {
+    background: #d9dfdc;
+    border-radius: 32px;
+    height: 100%;
+    overflow-y: auto;
+    padding: 16px 10px 20px;
+}
+
+.message {
+    display: flex;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.message.left {
+    justify-content: flex-start;
+}
+
+.message.right {
+    justify-content: flex-end;
+}
+
+.bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+    position: relative;
+    color: #1c1d1f;
+}
+
+.message.right .bubble {
+    background: #dcf8c6;
+}
+
+.author {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #2d3a3c;
+}
+
+.text {
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.timestamp {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #546e7a;
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 14px;
+    }
+    .upload-panel,
+    .chat-frame {
+        padding: 18px;
+    }
+    .phone {
+        max-width: 100%;
+    }
+}

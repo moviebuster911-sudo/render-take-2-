@@ -1,0 +1,6 @@
+03/15/2025, 09:12 - Alice: Hello everyone!
+03/15/2025, 09:13 - Bob: Hi Alice, how are you?
+03/15/2025, 09:14 - Alice: I'm good, thanks. What about you?
+This is a multiline message.
+03/15/2025, 09:15 - Bob: I'm fine too.
+03/15/2025, 09:16 - Charlie: Hey guys, what's up?

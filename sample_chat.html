@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WhatsApp Chat</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e5ddd5; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background-color: white; border-radius: 10px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .message { margin-bottom: 10px; display: flex; }
+        .message.left { justify-content: flex-start; }
+        .message.right { justify-content: flex-end; }
+        .bubble { max-width: 70%; padding: 10px 15px; border-radius: 20px; position: relative; word-wrap: break-word; }
+        .left .bubble { background-color: #ffffff; border: 1px solid #ddd; }
+        .right .bubble { background-color: #dcf8c6; }
+        .author { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+        .timestamp { font-size: 0.8em; color: #999; margin-top: 5px; }
+        .text { white-space: pre-wrap; }
+        #search { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" id="search" placeholder="Search messages...">
+        <div id="chat">
+
+            <div class="message left" data-author="Alice" data-text="Hello everyone!">
+                <div class="bubble" style="background-color: #f0f0f0;">
+                    <div class="author">Alice</div>
+                    <div class="text">Hello everyone!</div>
+                    <div class="timestamp">03/15/2025, 09:12</div>
+                </div>
+            </div>
+        
+            <div class="message left" data-author="Bob" data-text="Hi Alice, how are you?">
+                <div class="bubble" style="background-color: #dcf8c6;">
+                    <div class="author">Bob</div>
+                    <div class="text">Hi Alice, how are you?</div>
+                    <div class="timestamp">03/15/2025, 09:13</div>
+                </div>
+            </div>
+        
+            <div class="message left" data-author="Alice" data-text="I&#x27;m good, thanks. What about you?
+This is a multiline message.">
+                <div class="bubble" style="background-color: #f0f0f0;">
+                    <div class="author">Alice</div>
+                    <div class="text">I&#x27;m good, thanks. What about you?<br>This is a multiline message.</div>
+                    <div class="timestamp">03/15/2025, 09:14</div>
+                </div>
+            </div>
+        
+            <div class="message left" data-author="Bob" data-text="I&#x27;m fine too.">
+                <div class="bubble" style="background-color: #dcf8c6;">
+                    <div class="author">Bob</div>
+                    <div class="text">I&#x27;m fine too.</div>
+                    <div class="timestamp">03/15/2025, 09:15</div>
+                </div>
+            </div>
+        
+            <div class="message left" data-author="Charlie" data-text="Hey guys, what&#x27;s up?">
+                <div class="bubble" style="background-color: #ffffff;">
+                    <div class="author">Charlie</div>
+                    <div class="text">Hey guys, what&#x27;s up?</div>
+                    <div class="timestamp">03/15/2025, 09:16</div>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+    <script>
+        const searchInput = document.getElementById('search');
+        const messages = document.querySelectorAll('.message');
+        
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            messages.forEach(msg => {
+                const author = msg.dataset.author.toLowerCase();
+                const text = msg.dataset.text.toLowerCase();
+                if (author.includes(query) || text.includes(query)) {
+                    msg.style.display = '';
+                } else {
+                    msg.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

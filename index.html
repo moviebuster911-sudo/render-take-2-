@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Viewer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <div>
+                <h1>WhatsApp Chat Viewer</h1>
+                <p>Open exported WhatsApp chat text directly in the browser.</p>
+            </div>
+        </header>
+
+        <main class="content">
+            <section class="upload-panel">
+                <label class="file-label">
+                    Select WhatsApp .txt export
+                    <input type="file" id="chatFile" accept=".txt">
+                </label>
+                <label style="display:block; margin:12px 0;">
+                    Or paste a Google Drive share link (server must host backend):
+                    <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing" style="width:100%; padding:8px; margin-top:6px;">
+                </label>
+                <textarea id="pasteText" placeholder="Or paste the contents of the exported chat here"></textarea>
+                <div class="options-row">
+                    <button id="parseBtn" class="primary-btn">Parse Chat</button>
+                    <button id="clearBtn" class="secondary-btn">Clear</button>
+                </div>
+                <div class="info-row">
+                    <div id="errorMessage" class="error"></div>
+                    <div id="authorSelectContainer" class="author-select hidden">
+                        <label for="authorSelect">Select your WhatsApp identity:</label>
+                        <select id="authorSelect"></select>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chat-frame hidden" id="chatFrame">
+                <div class="chat-header">
+                    <div>
+                        <h2>Chat preview</h2>
+                        <p id="chatSummary"></p>
+                    </div>
+                    <button id="swapBtn" class="secondary-btn">Swap Users</button>
+                </div>
+                <div class="phone">
+                    <div class="screen" id="chatContainer"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
