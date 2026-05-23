@@ -353,6 +353,85 @@ body {
     margin-right: 4px;
 }
 
+/* Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--brand-teal);
+    color: white;
+    padding: 8px 12px;
+    flex-shrink: 0;
+    height: 56px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-bar.hidden {
+    display: none;
+}
+
+.search-close {
+    flex-shrink: 0;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.search-results-info {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+    min-width: 40px;
+    text-align: center;
+}
+
+.search-nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.search-nav-btn {
+    font-size: 16px;
+    padding: 6px;
+    width: 32px;
+    height: 32px;
+}
+
+.search-nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Chat Messages Area */
 .screen {
     flex: 1;
@@ -362,6 +441,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
 }
 
 .screen::-webkit-scrollbar {
@@ -379,6 +459,28 @@ body {
 
 .screen::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.3);
+}
+
+/* Empty Search State */
+.search-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: var(--tertiary-muted);
+    text-align: center;
+    padding: 20px;
+}
+
+.search-empty-state-icon {
+    font-size: 48px;
+    opacity: 0.3;
+}
+
+.search-empty-state-text {
+    font-size: 14px;
 }
 
 /* Messages */
@@ -408,6 +510,23 @@ body {
     justify-content: flex-end;
 }
 
+.message.search-active {
+    opacity: 0.5;
+}
+
+.message.search-active.search-match {
+    opacity: 1;
+}
+
+.message.search-active.search-match .bubble {
+    box-shadow: 0 0 0 2px var(--primary-green);
+}
+
+.message.search-active.search-current .bubble {
+    box-shadow: 0 0 8px rgba(37, 211, 102, 0.6);
+    background: #e8f5e9 !important;
+}
+
 .bubble {
     max-width: 85%;
     padding: 8px 12px;
@@ -419,6 +538,7 @@ body {
     word-wrap: break-word;
     display: flex;
     flex-direction: column;
+    transition: all 0.2s ease;
 }
 
 .message.right .bubble {
@@ -442,6 +562,20 @@ body {
     font-size: 13px;
     line-height: 1.4;
     word-break: break-word;
+}
+
+/* Search Highlight */
+.search-highlight {
+    background: #ffd700;
+    color: #000;
+    border-radius: 2px;
+    padding: 0 2px;
+    font-weight: 500;
+}
+
+.search-highlight.current {
+    background: #ffed4e;
+    box-shadow: 0 0 3px rgba(255, 215, 0, 0.6);
 }
 
 .timestamp {
@@ -580,6 +714,21 @@ body {
     .secondary-btn {
         align-self: flex-start;
     }
+
+    .search-bar {
+        gap: 6px;
+    }
+
+    .search-input {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .search-nav-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -599,6 +748,11 @@ body {
         padding: 6px 8px;
         height: 48px;
         margin-top: 22px;
+    }
+
+    .search-bar {
+        height: 48px;
+        padding: 6px 8px;
     }
 
     .avatar {
@@ -635,5 +789,15 @@ body {
         height: 32px;
         font-size: 16px;
         padding: 6px;
+    }
+
+    .search-input {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .search-results-info {
+        font-size: 11px;
+        min-width: 35px;
     }
 }
