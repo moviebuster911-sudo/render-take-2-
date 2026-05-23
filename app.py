@@ -6,7 +6,7 @@ import zipfile
 import urllib.request
 from urllib.parse import urlparse, parse_qs
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MEDIA_FOLDER'] = 'static/media'
 app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32MB limit
