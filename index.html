@@ -67,6 +67,9 @@
                             </div>
                         </div>
                         <div class="header-right">
+                            <button class="icon-btn" id="searchHeaderBtn" title="Search messages">
+                                <i class="fas fa-search"></i>
+                            </button>
                             <button class="icon-btn" title="Voice call">
                                 <i class="fas fa-phone"></i>
                             </button>
@@ -75,6 +78,29 @@
                             </button>
                             <button class="icon-btn" title="More options">
                                 <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Bar (Hidden by default) -->
+                    <div class="search-bar hidden" id="searchBar">
+                        <button class="icon-btn search-close" id="searchCloseBtn" title="Close search">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            id="searchInput" 
+                            placeholder="Search messages..."
+                            autocomplete="off"
+                        >
+                        <div class="search-results-info" id="searchResultsInfo"></div>
+                        <div class="search-nav-buttons">
+                            <button class="icon-btn search-nav-btn" id="searchPrevBtn" title="Previous result">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button class="icon-btn search-nav-btn" id="searchNextBtn" title="Next result">
+                                <i class="fas fa-chevron-down"></i>
                             </button>
                         </div>
                     </div>
