@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp Chat Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -40,15 +41,63 @@
             </section>
 
             <section class="chat-frame hidden" id="chatFrame">
-                <div class="chat-header">
+                <div class="chat-header-top">
                     <div>
                         <h2>Chat preview</h2>
                         <p id="chatSummary"></p>
                     </div>
                     <button id="swapBtn" class="secondary-btn">Swap Users</button>
                 </div>
+                
                 <div class="phone">
+                    <!-- WhatsApp Header -->
+                    <div class="whatsapp-header">
+                        <div class="header-left">
+                            <button class="icon-btn back-btn" id="backBtn" title="Back">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="contact-info">
+                                <div class="avatar">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="contact-text">
+                                    <div class="contact-name" id="contactName">Contact</div>
+                                    <div class="contact-status" id="contactStatus">online</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="header-right">
+                            <button class="icon-btn" title="Voice call">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                            <button class="icon-btn" title="Video call">
+                                <i class="fas fa-video"></i>
+                            </button>
+                            <button class="icon-btn" title="More options">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages Area -->
                     <div class="screen" id="chatContainer"></div>
+
+                    <!-- Message Composer -->
+                    <div class="composer-bar">
+                        <button class="composer-icon" title="Emoji">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                        <button class="composer-icon" title="Attachment">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <button class="composer-icon" title="Camera">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <input type="text" class="message-input" placeholder="Message" id="messageInput" readonly>
+                        <button class="send-btn" title="Send">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </div>
             </section>
         </main>
