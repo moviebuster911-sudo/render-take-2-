@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Viewer - Result</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            {% if theme == 'dark' %}
+                background: #1a1a1a;
+                color: #fff;
+            {% endif %}
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            {% if theme == 'dark' %}
+                background: #2a2a2a;
+                border-bottom-color: #444;
+            {% endif %}
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        select, button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        {% if theme == 'dark' %}
+            select, button {
+                background: #3a3a3a;
+                color: white;
+                border-color: #555;
+            }
+        {% endif %}
+        
+        select:hover, button:hover {
+            background: #f5f5f5;
+        }
+        
+        {% if theme == 'dark' %}
+            select:hover, button:hover {
+                background: #444;
+            }
+        {% endif %}
+        
+        button {
+            background: #25d366;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #128c7e;
+        }
+        
+        .info {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #666;
+            {% if theme == 'dark' %}
+                color: #aaa;
+            {% endif %}
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .message {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.left {
+            justify-content: flex-start;
+        }
+        
+        .message.right {
+            justify-content: flex-end;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .message.right .avatar {
+            order: 2;
+        }
+        
+        .bubble {
+            max-width: 70%;
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            {% if theme == 'dark' %}
+                background: #2a2a2a;
+                color: white;
+            {% endif %}
+        }
+        
+        .message.right .bubble {
+            background: #dcf8c6;
+            {% if theme == 'dark' %}
+                background: #056162;
+            {% endif %}
+        }
+        
+        .author {
+            font-weight: bold;
+            font-size: 13px;
+            color: #667eea;
+            margin-bottom: 5px;
+            {% if theme == 'dark' %}
+                color: #64b5f6;
+            {% endif %}
+        }
+        
+        .message.right .author {
+            color: #128c7e;
+            {% if theme == 'dark' %}
+                color: #26a69a;
+            {% endif %}
+        }
+        
+        .text {
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            color: #333;
+            {% if theme == 'dark' %}
+                color: white;
+            {% endif %}
+        }
+        
+        .message.right .text {
+            color: #000;
+            {% if theme == 'dark' %}
+                color: white;
+            {% endif %}
+        }
+        
+        .timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+            {% if theme == 'dark' %}
+                color: #888;
+            {% endif %}
+        }
+        
+        .edited-label {
+            font-size: 11px;
+            color: #999;
+            font-style: italic;
+            margin-left: 5px;
+        }
+        
+        .ticks {
+            font-size: 12px;
+            color: #128c7e;
+            margin-left: 5px;
+        }
+        
+        .message.right .ticks {
+            color: #128c7e;
+        }
+        
+        img, video {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .file-download {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 13px;
+            margin: 5px 0;
+            {% if theme == 'dark' %}
+                background: #3a3a3a;
+            {% endif %}
+        }
+        
+        .file-download:hover {
+            background: #e0e0e0;
+            {% if theme == 'dark' %}
+                background: #444;
+            {% endif %}
+        }
+        
+        .footer {
+            background: white;
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            font-size: 13px;
+            color: #666;
+            {% if theme == 'dark' %}
+                background: #2a2a2a;
+                border-top-color: #444;
+                color: #aaa;
+            {% endif %}
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-right: 10px;
+            padding: 8px 16px;
+            background: #ddd;
+            color: #333;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📱 WhatsApp Chat Viewer</h1>
+        <p id="chatInfo">Loading chat...</p>
+    </div>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="userSelect">View as:</label>
+            <select id="userSelect">
+                <option value="">-- Select User --</option>
+                {% for user in users %}
+                    <option value="{{ user }}">{{ user }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="control-group">
+            <button onclick="location.reload()">🔄 Refresh</button>
+            <a href="/" class="back-btn">← Back</a>
+        </div>
+    </div>
+    
+    <div class="chat-container">
+        {{ chat_content | safe }}
+    </div>
+    
+    <div class="footer">
+        <p>Chat viewer loaded successfully. Select a user to highlight their messages.</p>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSelect = document.getElementById('userSelect');
+            const messages = document.querySelectorAll('.message');
+            
+            // Update info
+            const messageCount = messages.length;
+            const userCount = {{ users|length }};
+            document.getElementById('chatInfo').textContent = 
+                `${messageCount} messages from ${userCount} user${userCount === 1 ? '' : 's'}`;
+            
+            // Handle user selection
+            userSelect.addEventListener('change', function() {
+                const selectedUser = this.value;
+                messages.forEach(msg => {
+                    if (!selectedUser) {
+                        msg.style.opacity = '1';
+                    } else {
+                        const isUserMessage = msg.classList.contains('right');
+                        msg.style.opacity = isUserMessage ? '1' : '0.4';
+                    }
+                });
+            });
+            
+            // Auto-scroll to bottom
+            const container = document.querySelector('.chat-container');
+            container.scrollTop = container.scrollHeight;
+        });
+    </script>
+</body>
+</html>
