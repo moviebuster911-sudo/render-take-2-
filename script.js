@@ -10,6 +10,9 @@ const chatFrame = document.getElementById('chatFrame');
 const chatContainer = document.getElementById('chatContainer');
 const chatSummary = document.getElementById('chatSummary');
 const swapBtn = document.getElementById('swapBtn');
+const contactName = document.getElementById('contactName');
+const contactStatus = document.getElementById('contactStatus');
+const messageInput = document.getElementById('messageInput');
 
 let currentMessages = [];
 let currentUsers = [];
@@ -73,6 +76,14 @@ function renderChat(messages, user) {
     authorSelectContainer.classList.toggle('hidden', currentUsers.length === 0);
     authorSelect.innerHTML = '';
 
+    // Update contact info header
+    if (user) {
+        contactName.textContent = user;
+        const userMessageCount = messages.filter(msg => msg.author === user).length;
+        const totalMessages = messages.length;
+        contactStatus.textContent = `${userMessageCount} messages · online`;
+    }
+
     currentUsers.forEach((author, index) => {
         const option = document.createElement('option');
         option.value = author;
@@ -81,11 +92,12 @@ function renderChat(messages, user) {
         authorSelect.appendChild(option);
     });
 
-    messages.forEach(msg => {
+    messages.forEach((msg, index) => {
         const isUser = swapped ? msg.author !== user : msg.author === user;
         const side = isUser ? 'right' : 'left';
         const messageEl = document.createElement('div');
         messageEl.className = `message ${side}`;
+        
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
 
@@ -101,7 +113,13 @@ function renderChat(messages, user) {
         timestampEl.className = 'timestamp';
         let timestampText = msg.datetime;
         if (msg.isEdited) timestampText += ' · Edited';
-        timestampEl.textContent = timestampText;
+        
+        // Add status icon for outgoing messages
+        if (isUser) {
+            timestampEl.innerHTML = escapeHtml(timestampText) + ' <span class="message-status">✓✓</span>';
+        } else {
+            timestampEl.textContent = timestampText;
+        }
 
         bubble.appendChild(authorEl);
         bubble.appendChild(textEl);
@@ -111,6 +129,10 @@ function renderChat(messages, user) {
     });
 
     chatFrame.classList.remove('hidden');
+    // Auto-scroll to bottom
+    setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, 100);
 }
 
 function showError(message) {
@@ -180,7 +202,7 @@ parseBtn.addEventListener('click', async () => {
         } catch (err) {
             // Common cause: CORS blocked by Google. Show actionable guidance.
             const msg = err.message || 'Failed to download from Google Drive.';
-            showError(msg + '\nIf you see a CORS or cross-origin error, GitHub Pages (static hosting) cannot fetch the file directly from Google Drive.\n\nOptions:\n• Make the file publicly accessible and try again.\n• Use a small server (Render/Railway) or serverless proxy to fetch the Drive file for you.\n• Download the file locally and paste its contents into the box.');
+            showError(msg + '\nIf you see a CORS or cross-origin error, GitHub Pages (static hosting) cannot fetch the file directly from Google Drive.\n\nOptions:\n• Make the file publicly accessible and use a proxy\n• Upload the file directly instead\n• Use a backend server');
             parseBtn.disabled = false;
             parseBtn.textContent = 'Parse Chat';
             return;
@@ -222,3 +244,36 @@ function extractDriveFileId(url) {
     }
     return null;
 }
+
+// Event listeners
+clearBtn.addEventListener('click', () => {
+    chatFile.value = '';
+    pasteText.value = '';
+    driveLinkInput.value = '';
+    clearError();
+});
+
+authorSelect.addEventListener('change', (e) => {
+    activeUser = e.target.value;
+    renderChat(currentMessages, activeUser);
+});
+
+swapBtn.addEventListener('click', () => {
+    swapped = !swapped;
+    renderChat(currentMessages, activeUser);
+    swapBtn.textContent = swapped ? 'Swap Users (Swapped)' : 'Swap Users';
+});
+
+// Prevent default behavior for composer
+messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+    }
+});
+
+document.querySelectorAll('.send-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Send button is just for UI - actual sending would require backend
+        console.log('Send button clicked - demo only');
+    });
+});
