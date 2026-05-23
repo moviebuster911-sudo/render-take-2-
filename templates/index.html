@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WhatsApp Chat Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 50px; }
+        .container { max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 10px; }
+        input[type="file"] { margin: 20px 0; }
+        button { background: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #128c7e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WhatsApp Chat Viewer</h1>
+        <p>Upload your exported WhatsApp chat (.txt), paste a Google Drive share link, and optionally upload a media folder (zip).</p>
+        {% if error %}
+            <p style="color: #ffcccc;">{{ error }}</p>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="chat_file" accept=".txt"><br><br>
+            <label>Or paste Google Drive share link:</label><br>
+            <input type="url" name="drive_link" placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing" style="width: 100%; padding: 10px; border-radius: 5px; border: none; margin: 10px 0;"><br>
+            <input type="file" name="media_file" accept=".zip"><br><br>
+            <label>Theme:</label><br>
+            <input type="radio" name="theme" value="light" checked> Light Mode<br>
+            <input type="radio" name="theme" value="dark"> Dark Mode<br><br>
+            <button type="submit">Upload and View</button>
+        </form>
+    </div>
+</body>
+</html>
