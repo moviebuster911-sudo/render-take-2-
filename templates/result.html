@@ -100,6 +100,11 @@
             background: #128c7e;
         }
         
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
         .info {
             padding: 8px 12px;
             font-size: 14px;
@@ -300,6 +305,8 @@
             border-radius: 5px;
             font-size: 14px;
             transition: all 0.3s;
+            border: none;
+            cursor: pointer;
         }
         
         .back-btn:hover {
@@ -315,9 +322,9 @@
     
     <div class="controls">
         <div class="control-group">
-            <label for="userSelect">View as:</label>
+            <label for="userSelect">👤 View as:</label>
             <select id="userSelect">
-                <option value="">-- Select User --</option>
+                <option value="">-- View All Messages --</option>
                 {% for user in users %}
                     <option value="{{ user }}">{{ user }}</option>
                 {% endfor %}
@@ -329,42 +336,133 @@
         </div>
     </div>
     
-    <div class="chat-container">
+    <div class="chat-container" id="chatContainer">
         {{ chat_content | safe }}
     </div>
     
     <div class="footer">
-        <p>Chat viewer loaded successfully. Select a user to highlight their messages.</p>
+        <p>Select a user from the dropdown to swap perspective. Messages will be reorganized from that user's point of view.</p>
     </div>
     
     <script>
+        // Store original messages data
+        let allMessages = [];
+        let allUsers = {{ users | tojson }};
+        const theme = '{{ theme }}';
+        
         document.addEventListener('DOMContentLoaded', function() {
             const userSelect = document.getElementById('userSelect');
-            const messages = document.querySelectorAll('.message');
+            const chatContainer = document.getElementById('chatContainer');
             
-            // Update info
-            const messageCount = messages.length;
-            const userCount = {{ users|length }};
-            document.getElementById('chatInfo').textContent = 
-                `${messageCount} messages from ${userCount} user${userCount === 1 ? '' : 's'}`;
-            
-            // Handle user selection
-            userSelect.addEventListener('change', function() {
-                const selectedUser = this.value;
-                messages.forEach(msg => {
-                    if (!selectedUser) {
-                        msg.style.opacity = '1';
-                    } else {
-                        const isUserMessage = msg.classList.contains('right');
-                        msg.style.opacity = isUserMessage ? '1' : '0.4';
-                    }
+            // Parse existing messages into data structure
+            const messageElements = document.querySelectorAll('.message');
+            messageElements.forEach(msgEl => {
+                const author = msgEl.getAttribute('data-user');
+                const datetime = msgEl.getAttribute('data-datetime');
+                const bubbleEl = msgEl.querySelector('.bubble');
+                const isRight = msgEl.classList.contains('right');
+                
+                allMessages.push({
+                    author: author,
+                    datetime: datetime,
+                    html: msgEl.outerHTML,
+                    isRight: isRight
                 });
             });
             
+            // Update info
+            const messageCount = allMessages.length;
+            const userCount = allUsers.length;
+            document.getElementById('chatInfo').textContent = 
+                `${messageCount} messages from ${userCount} user${userCount === 1 ? '' : 's'}`;
+            
+            // Handle user selection for perspective swap
+            userSelect.addEventListener('change', function() {
+                const selectedUser = this.value;
+                
+                if (!selectedUser) {
+                    // Show all messages in original order
+                    renderMessages(allMessages);
+                } else {
+                    // Re-render messages from selected user's perspective
+                    const swappedMessages = allMessages.map(msg => ({
+                        ...msg,
+                        isRight: msg.author.toLowerCase() === selectedUser.toLowerCase()
+                    }));
+                    renderMessages(swappedMessages);
+                }
+            });
+            
             // Auto-scroll to bottom
-            const container = document.querySelector('.chat-container');
-            container.scrollTop = container.scrollHeight;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         });
+        
+        function renderMessages(messages) {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${msg.isRight ? 'right' : 'left'}`;
+                messageEl.setAttribute('data-user', msg.author);
+                messageEl.setAttribute('data-datetime', msg.datetime);
+                
+                const avatarInitial = msg.author.charAt(0).toUpperCase();
+                const avatarColor = getAvatarColor(msg.author);
+                
+                messageEl.innerHTML = `
+                    <div class="avatar" style="background-color: ${avatarColor};">${avatarInitial}</div>
+                    <div class="bubble">
+                        <div class="author">${escapeHtml(msg.author)}</div>
+                        ${extractBubbleContent(msg.html)}
+                        <div class="timestamp">${escapeHtml(msg.datetime)}${msg.isRight ? ' <span class="ticks">✓✓</span>' : ''}</div>
+                    </div>
+                `;
+                
+                chatContainer.appendChild(messageEl);
+            });
+            
+            // Auto-scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        function extractBubbleContent(htmlString) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlString;
+            const bubble = tempDiv.querySelector('.bubble');
+            
+            if (!bubble) return '';
+            
+            // Get inner HTML of bubble excluding author and timestamp
+            let content = '';
+            Array.from(bubble.children).forEach(child => {
+                if (!child.classList.contains('author') && !child.classList.contains('timestamp')) {
+                    content += child.outerHTML;
+                }
+            });
+            
+            return content;
+        }
+        
+        function getAvatarColor(author) {
+            const colors = ['#25d366', '#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#fee140', '#30b0fe'];
+            let hash = 0;
+            for (let i = 0; i < author.length; i++) {
+                hash = author.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return colors[Math.abs(hash) % colors.length];
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
     </script>
 </body>
 </html>
