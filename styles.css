@@ -266,6 +266,7 @@ body {
     margin-top: 26px;
     flex-shrink: 0;
     height: 56px;
+    min-height: 56px;
 }
 
 .header-left {
@@ -322,6 +323,7 @@ body {
     gap: 8px;
     align-items: center;
     flex-shrink: 0;
+    justify-content: flex-end;
 }
 
 .icon-btn {
@@ -338,6 +340,9 @@ body {
     justify-content: center;
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    flex-shrink: 0;
 }
 
 .icon-btn:hover {
@@ -363,6 +368,7 @@ body {
     padding: 8px 12px;
     flex-shrink: 0;
     height: 56px;
+    min-height: 56px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     animation: slideDown 0.2s ease;
 }
@@ -379,11 +385,14 @@ body {
 }
 
 .search-bar.hidden {
-    display: none;
+    display: none !important;
 }
 
 .search-close {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-input {
@@ -397,6 +406,7 @@ body {
     color: white;
     outline: none;
     transition: all 0.2s ease;
+    min-width: 80px;
 }
 
 .search-input::placeholder {
@@ -411,13 +421,15 @@ body {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.9);
     white-space: nowrap;
-    min-width: 40px;
+    min-width: 45px;
     text-align: center;
+    padding: 0 4px;
 }
 
 .search-nav-buttons {
     display: flex;
     gap: 4px;
+    flex-shrink: 0;
 }
 
 .search-nav-btn {
@@ -425,6 +437,9 @@ body {
     padding: 6px;
     width: 32px;
     height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    flex-shrink: 0;
 }
 
 .search-nav-btn:disabled {
@@ -604,6 +619,7 @@ body {
     border-top: 1px solid var(--divider);
     flex-shrink: 0;
     height: 56px;
+    min-height: 56px;
 }
 
 .composer-icon {
@@ -621,6 +637,8 @@ body {
     flex-shrink: 0;
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
 }
 
 .composer-icon:hover {
@@ -666,6 +684,8 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    min-width: 36px;
+    min-height: 36px;
     transition: all 0.2s ease;
 }
 
@@ -728,6 +748,23 @@ body {
         width: 28px;
         height: 28px;
         font-size: 14px;
+        min-width: 28px;
+        min-height: 28px;
+    }
+
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .composer-icon,
+    .send-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
     }
 }
 
@@ -747,11 +784,13 @@ body {
     .whatsapp-header {
         padding: 6px 8px;
         height: 48px;
+        min-height: 48px;
         margin-top: 22px;
     }
 
     .search-bar {
         height: 48px;
+        min-height: 48px;
         padding: 6px 8px;
     }
 
@@ -781,12 +820,25 @@ body {
     .composer-bar {
         padding: 6px 8px;
         gap: 6px;
+        height: 48px;
+        min-height: 48px;
     }
 
     .composer-icon,
     .send-btn {
         width: 32px;
         height: 32px;
+        font-size: 16px;
+        padding: 6px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .icon-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
         font-size: 16px;
         padding: 6px;
     }
@@ -798,6 +850,22 @@ body {
 
     .search-results-info {
         font-size: 11px;
-        min-width: 35px;
+        min-width: 40px;
+    }
+
+    .search-nav-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
+        font-size: 14px;
+    }
+
+    .header-right {
+        gap: 4px;
+    }
+
+    .search-bar {
+        gap: 4px;
     }
 }
