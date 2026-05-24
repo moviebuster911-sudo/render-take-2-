@@ -14,10 +14,22 @@ const contactName = document.getElementById('contactName');
 const contactStatus = document.getElementById('contactStatus');
 const messageInput = document.getElementById('messageInput');
 
+// Search elements
+const searchHeaderBtn = document.getElementById('searchHeaderBtn');
+const searchBar = document.getElementById('searchBar');
+const searchInput = document.getElementById('searchInput');
+const searchCloseBtn = document.getElementById('searchCloseBtn');
+const searchResultsInfo = document.getElementById('searchResultsInfo');
+const searchPrevBtn = document.getElementById('searchPrevBtn');
+const searchNextBtn = document.getElementById('searchNextBtn');
+
 let currentMessages = [];
 let currentUsers = [];
 let activeUser = null;
 let swapped = false;
+
+// Initialize search handler
+let searchHandler = null;
 
 const messagePattern = /^(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4},?\s\d{1,2}:\d{2}\s?(?:AM|PM|am|pm)?)\s-\s([^:]+):\s(.*)$/;
 
@@ -66,6 +78,281 @@ function buildAuthorList(messages) {
         }
     }
     return authors;
+}
+
+/**
+ * WhatsApp-style Message Search Handler
+ */
+class MessageSearchHandler {
+    constructor(options = {}) {
+        this.options = {
+            debounceDelay: 200,
+            scrollBehavior: 'smooth',
+            highlightClass: 'search-highlight',
+            currentHighlightClass: 'current',
+            ...options
+        };
+
+        this.state = {
+            query: '',
+            results: [],
+            currentIndex: 0,
+            isActive: false,
+        };
+
+        this.elements = {
+            searchBtn: null,
+            searchBar: null,
+            searchInput: null,
+            searchCloseBtn: null,
+            searchResultsInfo: null,
+            searchPrevBtn: null,
+            searchNextBtn: null,
+            chatContainer: null
+        };
+
+        this.debounceTimer = null;
+        this.isInitialized = false;
+    }
+
+    init(elements) {
+        this.elements = { ...this.elements, ...elements };
+        this.attachEventListeners();
+        this.isInitialized = true;
+    }
+
+    attachEventListeners() {
+        const { searchBtn, searchInput, searchCloseBtn, searchPrevBtn, searchNextBtn } = this.elements;
+
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => this.openSearch());
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => this.handleSearchInput(e.target.value));
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.navigateNext();
+                }
+            });
+        }
+
+        if (searchCloseBtn) {
+            searchCloseBtn.addEventListener('click', () => this.closeSearch());
+        }
+
+        if (searchPrevBtn) {
+            searchPrevBtn.addEventListener('click', () => this.navigatePrev());
+        }
+
+        if (searchNextBtn) {
+            searchNextBtn.addEventListener('click', () => this.navigateNext());
+        }
+    }
+
+    openSearch() {
+        if (!this.elements.searchBar) return;
+        this.elements.searchBar.classList.remove('hidden');
+        this.state.isActive = true;
+        this.elements.searchInput?.focus();
+    }
+
+    closeSearch() {
+        if (!this.elements.searchBar) return;
+        this.elements.searchBar.classList.add('hidden');
+        this.state.isActive = false;
+        this.clearSearch();
+    }
+
+    handleSearchInput(value) {
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => {
+            this.performSearch(value);
+        }, this.options.debounceDelay);
+    }
+
+    normalizeText(text) {
+        return text.toLowerCase().trim().replace(/\s+/g, ' ');
+    }
+
+    findMatches(text, query) {
+        if (!query || !text) return [];
+
+        const normalizedText = this.normalizeText(text);
+        const normalizedQuery = this.normalizeQuery(query);
+        const matches = [];
+        let index = 0;
+
+        while ((index = normalizedText.indexOf(normalizedQuery, index)) !== -1) {
+            matches.push({ start: index, end: index + normalizedQuery.length });
+            index += normalizedQuery.length;
+        }
+        return matches;
+    }
+
+    normalizeQuery(query) {
+        return this.normalizeText(query);
+    }
+
+    performSearch(query) {
+        this.state.query = query.trim();
+        this.state.results = [];
+        this.state.currentIndex = 0;
+
+        if (!this.state.query) {
+            this.clearSearch();
+            return;
+        }
+
+        const messageElements = this.elements.chatContainer?.querySelectorAll('.message') || [];
+
+        messageElements.forEach((msgEl, msgIndex) => {
+            const textEl = msgEl.querySelector('.text');
+            if (!textEl) return;
+
+            const messageText = textEl.textContent || '';
+            const matches = this.findMatches(messageText, this.state.query);
+
+            if (matches.length > 0) {
+                this.state.results.push({
+                    messageElement: msgEl,
+                    textElement: textEl,
+                    messageIndex: msgIndex,
+                    messageText: messageText,
+                    matches: matches
+                });
+            }
+        });
+
+        this.updateSearchUI();
+        this.applyHighlights();
+        this.scrollToCurrentResult();
+    }
+
+    updateSearchUI() {
+        const { searchResultsInfo, searchPrevBtn, searchNextBtn } = this.elements;
+
+        if (searchResultsInfo) {
+            if (this.state.results.length === 0) {
+                searchResultsInfo.textContent = 'No results';
+            } else {
+                const currentNum = this.state.currentIndex + 1;
+                searchResultsInfo.textContent = `${currentNum}/${this.state.results.length}`;
+            }
+        }
+
+        if (searchPrevBtn) searchPrevBtn.disabled = this.state.results.length === 0;
+        if (searchNextBtn) searchNextBtn.disabled = this.state.results.length === 0;
+    }
+
+    applyHighlights() {
+        this.clearHighlights();
+
+        if (this.state.results.length === 0) {
+            this.applyDimmedState();
+            return;
+        }
+
+        this.state.results.forEach((result, resultIndex) => {
+            const { messageElement, textElement, messageText, matches } = result;
+            const isCurrent = resultIndex === this.state.currentIndex;
+
+            messageElement.classList.add('search-active', 'search-match');
+            if (isCurrent) messageElement.classList.add('search-current');
+
+            this.highlightText(textElement, messageText, matches, isCurrent);
+        });
+
+        const messageElements = this.elements.chatContainer?.querySelectorAll('.message') || [];
+        messageElements.forEach((msgEl) => {
+            if (!msgEl.classList.contains('search-match')) {
+                msgEl.classList.add('search-active');
+            }
+        });
+    }
+
+    highlightText(textElement, originalText, matches, isCurrent) {
+        if (matches.length === 0) return;
+
+        const normalizedText = this.normalizeText(originalText);
+        let htmlContent = '';
+        let lastIndex = 0;
+
+        matches.forEach((match) => {
+            // Find corresponding position in original text
+            htmlContent += escapeHtml(originalText.substring(lastIndex, match.start));
+
+            const matchedText = originalText.substring(match.start, match.end);
+            const highlightClass = isCurrent 
+                ? `${this.options.highlightClass} ${this.options.currentHighlightClass}` 
+                : this.options.highlightClass;
+            htmlContent += `<span class="${highlightClass}">${escapeHtml(matchedText)}</span>`;
+
+            lastIndex = match.end;
+        });
+
+        htmlContent += escapeHtml(originalText.substring(lastIndex));
+        textElement.innerHTML = htmlContent;
+    }
+
+    applyDimmedState() {
+        const messageElements = this.elements.chatContainer?.querySelectorAll('.message') || [];
+        messageElements.forEach((msgEl) => {
+            msgEl.classList.add('search-active');
+        });
+    }
+
+    clearHighlights() {
+        const messageElements = this.elements.chatContainer?.querySelectorAll('.message') || [];
+        messageElements.forEach((msgEl) => {
+            msgEl.classList.remove('search-active', 'search-match', 'search-current');
+        });
+    }
+
+    navigatePrev() {
+        if (this.state.results.length === 0) return;
+        this.state.currentIndex = (this.state.currentIndex - 1 + this.state.results.length) % this.state.results.length;
+        this.updateSearchUI();
+        this.applyHighlights();
+        this.scrollToCurrentResult();
+    }
+
+    navigateNext() {
+        if (this.state.results.length === 0) return;
+        this.state.currentIndex = (this.state.currentIndex + 1) % this.state.results.length;
+        this.updateSearchUI();
+        this.applyHighlights();
+        this.scrollToCurrentResult();
+    }
+
+    scrollToCurrentResult() {
+        if (this.state.results.length === 0) return;
+
+        const currentResult = this.state.results[this.state.currentIndex];
+        const messageElement = currentResult.messageElement;
+
+        if (messageElement && this.elements.chatContainer) {
+            messageElement.scrollIntoView({ behavior: this.options.scrollBehavior, block: 'center' });
+        }
+    }
+
+    clearSearch() {
+        this.state.query = '';
+        this.state.results = [];
+        this.state.currentIndex = 0;
+        this.clearHighlights();
+        this.updateSearchUI();
+
+        if (this.elements.searchInput) {
+            this.elements.searchInput.value = '';
+        }
+    }
+
+    destroy() {
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.isInitialized = false;
+    }
 }
 
 function renderChat(messages, user) {
@@ -129,6 +416,22 @@ function renderChat(messages, user) {
     });
 
     chatFrame.classList.remove('hidden');
+    
+    // Initialize search handler after rendering
+    if (!searchHandler) {
+        searchHandler = new MessageSearchHandler();
+        searchHandler.init({
+            searchBtn: searchHeaderBtn,
+            searchBar: searchBar,
+            searchInput: searchInput,
+            searchCloseBtn: searchCloseBtn,
+            searchResultsInfo: searchResultsInfo,
+            searchPrevBtn: searchPrevBtn,
+            searchNextBtn: searchNextBtn,
+            chatContainer: chatContainer
+        });
+    }
+
     // Auto-scroll to bottom
     setTimeout(() => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -202,7 +505,7 @@ parseBtn.addEventListener('click', async () => {
         } catch (err) {
             // Common cause: CORS blocked by Google. Show actionable guidance.
             const msg = err.message || 'Failed to download from Google Drive.';
-            showError(msg + '\nIf you see a CORS or cross-origin error, GitHub Pages (static hosting) cannot fetch the file directly from Google Drive.\n\nOptions:\n• Make the file publicly accessible and use a proxy\n• Upload the file directly instead\n• Use a backend server');
+            showError(msg + '\nIf you see a CORS or cross-origin error, GitHub Pages (static hosting) cannot fetch the file directly from Google Drive.\n\nOptions:\n• Make the file publicly accessible\n• Use the server backend\n• Paste the file contents directly');
             parseBtn.disabled = false;
             parseBtn.textContent = 'Parse Chat';
             return;
